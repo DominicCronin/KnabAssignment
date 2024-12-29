@@ -1,6 +1,7 @@
 ﻿using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using System.Reflection;
 using MEO = Microsoft.Extensions.Options;
@@ -51,6 +52,14 @@ namespace ExchangeRates.Server.Tests
             Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T09:45:00.000Z"), result.Data[0]!.LastHistoricalData);
 
             Assert.AreEqual(5, result.Data.Length);
+        }
+
+        [TestMethod]
+        public void Quote_WithSingleConvert_IsCorrectlyParsed()
+        {
+            var quotesJson = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExchangeRates.Server.Tests.cryptocurrency_quote_single_convert_response.json");
+            using var reader = new StreamReader(quotesJson!);
+            var responseString = reader.ReadToEnd();
         }
 
     }

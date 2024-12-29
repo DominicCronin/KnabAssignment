@@ -1,4 +1,11 @@
+using ExchangeRates.Server.Options;
+using ExchangeRates.Server.Services;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<CoinMarketCapOptions>(builder.Configuration.GetSection(CoinMarketCapOptions.Section));
+builder.Services.AddSingleton<CoinMarketCapClient>();
 
 builder.AddServiceDefaults();
 
@@ -25,6 +32,14 @@ var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
+
+app.MapGet("/cmc", async (CoinMarketCapClient client) =>
+{
+    var result = await client.GetLatestQuoteAsync("BTC");
+    return result.Match(
+        success => Results.Ok(success),
+        failure => Results.BadRequest(failure));
+});
 
 app.MapGet("/weatherforecast", () =>
 {

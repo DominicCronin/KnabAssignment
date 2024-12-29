@@ -9,10 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="cryptocurrency_quote_single_convert_response.json" />
     <None Remove="GetFirstIdForSymbol.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="cryptocurrency_quote_single_convert_response.json" />
     <EmbeddedResource Include="GetFirstIdForSymbol.json" />
   </ItemGroup>
 
