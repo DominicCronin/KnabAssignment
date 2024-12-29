@@ -51,7 +51,7 @@ namespace ExchangeRates.Server.Tests
             Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2010-07-13T00:05:00.000Z"), result.Data[0]!.FirstHistoricalData);
             Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T09:45:00.000Z"), result.Data[0]!.LastHistoricalData);
 
-            Assert.AreEqual(5, result.Data.Length);
+            Assert.AreEqual(6, result.Data.Length);
         }
 
         [TestMethod]
@@ -60,7 +60,20 @@ namespace ExchangeRates.Server.Tests
             var quotesJson = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExchangeRates.Server.Tests.cryptocurrency_quote_single_convert_response.json");
             using var reader = new StreamReader(quotesJson!);
             var responseString = reader.ReadToEnd();
+
+            var result = CoinMarketCapClient.ParseCoinMarketCapQuote(responseString);
+
+            Assert.IsTrue(result.IsSuccess);
         }
 
+        [TestMethod]
+        public void Quote_WithMalformedJson_ReturnsFaulted()
+        {
+            string responseString = "}{";
+
+            var result = CoinMarketCapClient.ParseCoinMarketCapQuote(responseString);
+
+            Assert.IsTrue(result.IsFaulted);
+        }
     }
 }

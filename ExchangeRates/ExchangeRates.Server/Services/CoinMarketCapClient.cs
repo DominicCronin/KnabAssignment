@@ -11,7 +11,7 @@ namespace ExchangeRates.Server.Services
 {
     public class CoinMarketCapClient(IOptions<CoinMarketCapOptions> options, ILogger<CoinMarketCapClient> logger)
     {
-        private static readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true, };
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
         internal async Task<Result<CoinMarketCapQuote>> GetLatestQuoteAsync(string symbol)
         {
             Result<string> id = await GetHighestRankIdForSymbol(symbol);
@@ -76,14 +76,23 @@ namespace ExchangeRates.Server.Services
             return JsonSerializer.Deserialize<IdMapResponse>(responseString, _jsonSerializerOptions);
         }
 
-        private static Result<CoinMarketCapQuote> ParseCoinMarketCapQuote(string responseString)
+        internal static Result<CoinMarketCapQuote> ParseCoinMarketCapQuote(string responseString)
         {
-            CoinMarketCapQuote? listings = JsonSerializer.Deserialize<CoinMarketCapQuote>(responseString);
-            if (listings == null)
-            { 
-                return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Failed to parse latest listings. Response was null.")); 
+            CoinMarketCapQuote? quote;
+            try
+            {
+                quote = JsonSerializer.Deserialize<CoinMarketCapQuote>(responseString);
             }
-            return new Result<CoinMarketCapQuote>(listings);
+            catch (JsonException ex)
+            {
+                return new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to parse latest quote. {ex.Message}", ex));
+
+            }
+            if (quote == null)
+            { 
+                return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Failed to parse latest quote. Response was null.")); 
+            }
+            return new Result<CoinMarketCapQuote>(quote);
         }
 
         private string BuildHighestRankingIdForSymbolUri(string symbol)
