@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CoinMarketCapOptions>(builder.Configuration.GetSection(CoinMarketCapOptions.Section));
-builder.Services.AddSingleton<CoinMarketCapClient>();
+builder.Services.AddScoped<CoinMarketCapClient>();
 
 builder.AddServiceDefaults();
 
