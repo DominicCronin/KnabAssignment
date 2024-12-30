@@ -39,9 +39,9 @@ namespace ExchangeRates.Server.Services
 
                 return response switch
                 {
-                    { IsSuccessStatusCode: true } when (response.Content != null) => (await ReadAndParseLatestCoinMarketCapQuote(response, symbol)),
-                    { IsSuccessStatusCode: true } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get latest listings. Status code: {response.StatusCode}")),
-                    { IsSuccessStatusCode: false } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get latest listings. Status code: {response.StatusCode}"))
+                    { IsSuccessStatusCode: true } when (response.Content != null) => (await ReadAndParseLatestCoinMarketCapQuote(response, id)),
+                    { IsSuccessStatusCode: true } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get id for symbol. Content was null. Status code: {response.StatusCode}")),
+                    { IsSuccessStatusCode: false } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get id for symbol. Status code: {response.StatusCode}"))
                 };
             },
             exception =>
@@ -50,20 +50,20 @@ namespace ExchangeRates.Server.Services
             });
         }
 
-        private async Task<Result<CoinMarketCapQuote>> ReadAndParseLatestCoinMarketCapQuote(HttpResponseMessage response, string symbol)
+        private async Task<Result<CoinMarketCapQuote>> ReadAndParseLatestCoinMarketCapQuote(HttpResponseMessage response, string id)
         {
             string rawLatestQuote = await response.Content.ReadAsStringAsync();
             if (rawLatestQuote == null)
             {
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Failed to get latest quote. Response was null."));
             }
-            return ParseCoinMarketCapQuote(rawLatestQuote, symbol);
+            return ParseCoinMarketCapQuote(rawLatestQuote, id);
         }
 
-        internal Result<CoinMarketCapQuote> ParseCoinMarketCapQuote(string responseString, string symbol)
+        internal Result<CoinMarketCapQuote> ParseCoinMarketCapQuote(string responseString, string id)
         {
             if (responseString == null){ return new Result<CoinMarketCapQuote>(new ArgumentNullException(responseString));}
-            if (symbol == null) { return new Result<CoinMarketCapQuote>(new ArgumentNullException(symbol));}
+            if (id == null) { return new Result<CoinMarketCapQuote>(new ArgumentNullException(id));}
 
             CoinMarketCapQuote quote = new();
             JsonNode? responseDom;
@@ -87,9 +87,10 @@ namespace ExchangeRates.Server.Services
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Status element was null"));
             }
 
-            JsonNode? quoteNode = responseDom["data"]?[symbol!]?[0]?["quote"]?[_options.TargetCurrencySymbol];
+            JsonNode? quoteNode = responseDom["data"]?[id]?["quote"]?[_options.TargetCurrencySymbol];                           
             if (quoteNode == null)
             {
+                _logger.LogError($"Quote element was null when querying data.id.quote.{_options.TargetCurrencySymbol}");
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Quote element was null"));
             }
 
@@ -102,7 +103,7 @@ namespace ExchangeRates.Server.Services
             {
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Unable to parse response to models", ex));
             }
-            quote.Symbol = symbol;
+            quote.CurrencyId = id;
             quote.TargetCurrencySymbol = _options.TargetCurrencySymbol;
 
             return new Result<CoinMarketCapQuote>(quote);
@@ -111,11 +112,9 @@ namespace ExchangeRates.Server.Services
         private string BuildLatestQuoteRequestUri(string id)
         {
             UriBuilder uriBuilder = new(_options.BaseUrl);
-            uriBuilder.Path += "/cryptocurrency/quotes/latest";
+            uriBuilder.Path += "v2/cryptocurrency/quotes/latest";
 
             var queryString = HttpUtility.ParseQueryString(string.Empty);
-            queryString["start"] = "1";
-            queryString["limit"] = "1";
             queryString["id"] = id;
             queryString["convert"] = _options.TargetCurrencySymbol;
             uriBuilder.Query = queryString.ToString();

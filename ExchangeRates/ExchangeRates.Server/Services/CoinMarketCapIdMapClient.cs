@@ -69,7 +69,7 @@ namespace ExchangeRates.Server.Services
         {
             UriBuilder uriBuilder = new(_options.Value.BaseUrl);
             // /v1/cryptocurrency/map?start=1&limit=1&sort=cmc_rank&symbol=BTC
-            uriBuilder.Path += "/cryptocurrency/map";
+            uriBuilder.Path += "v1/cryptocurrency/map";
             var queryString = HttpUtility.ParseQueryString(string.Empty);
             queryString["symbol"] = symbol;
             queryString["start"] = "1";

@@ -54,9 +54,9 @@ namespace ExchangeRates.Server.Tests
                 var lastUpdated = result?.Quote?.LastUpdated;
                 Assert.IsNotNull(lastUpdated);
                 Assert.AreEqual(new DateTimeOffset(2024, 12, 29, 17, 59, 05, 0, new TimeSpan(0)), lastUpdated);
-                var symbol = result?.Symbol;
-                Assert.IsNotNull(symbol);
-                Assert.AreEqual("BTC", symbol);
+                var currencyId = result?.CurrencyId;
+                Assert.IsNotNull(currencyId);
+                Assert.AreEqual("1", currencyId);
                 var targetCurrencySymbol = result?.TargetCurrencySymbol;
                 Assert.IsNotNull(targetCurrencySymbol);
                 Assert.AreEqual("EUR", targetCurrencySymbol);
