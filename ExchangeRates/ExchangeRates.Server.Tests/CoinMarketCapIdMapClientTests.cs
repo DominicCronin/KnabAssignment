@@ -1,5 +1,6 @@
 ﻿using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
+using LanguageExt.Pipes;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
@@ -20,21 +21,26 @@ namespace ExchangeRates.Server.Tests
             var responseString = reader.ReadToEnd();
 
             var result = CoinMarketCapIdMapClient.ParseIdMapResponse(responseString);
-            
-            Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T10:00:16.657Z"), result!.Status.Timestamp);
-            Assert.AreEqual(0, result.Status.ErrorCode);
-            Assert.AreEqual(null, result.Status.ErrorMessage);
-            Assert.AreEqual(13, result.Status.Elapsed);
-            Assert.AreEqual(1, result.Status.CreditCount);
-            Assert.AreEqual(null, result.Status.Notice);
-            Assert.AreEqual(1, result.Data[0]!.Id);
-            Assert.AreEqual(1, result.Data[0]!.Rank);
-            Assert.AreEqual("Bitcoin", result.Data[0]!.Name);
-            Assert.AreEqual("bitcoin", result.Data[0]!.Slug);
-            Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2010-07-13T00:05:00.000Z"), result.Data[0]!.FirstHistoricalData);
-            Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T09:45:00.000Z"), result.Data[0]!.LastHistoricalData);
 
-            Assert.AreEqual(6, result.Data.Length);
+            result.IfSucc(result =>
+            {
+                    Assert.AreEqual(DateTimeOffset.Parse("2024-12-27T10:00:16.657Z"), result.Status.Timestamp);
+                    Assert.AreEqual(0, result.Status.ErrorCode);
+                    Assert.AreEqual(null, result.Status.ErrorMessage);
+                    Assert.AreEqual(13, result.Status.Elapsed);
+                    Assert.AreEqual(1, result.Status.CreditCount);
+                    Assert.AreEqual(null, result.Status.Notice);
+                    Assert.AreEqual(1, result.Data[0]!.Id);
+                    Assert.AreEqual(1, result.Data[0]!.Rank);
+                    Assert.AreEqual("Bitcoin", result.Data[0]!.Name);
+                    Assert.AreEqual("bitcoin", result.Data[0]!.Slug);
+                    Assert.AreEqual(DateTimeOffset.Parse("2010-07-13T00:05:00.000Z"), result.Data[0]!.FirstHistoricalData);
+                    Assert.AreEqual(DateTimeOffset.Parse("2024-12-27T09:45:00.000Z"), result.Data[0]!.LastHistoricalData);
+                    Assert.AreEqual(6, result.Data.Length);
+                }
+            );
+
+            Assert.IsTrue(result.IsSuccess);
         }
     }
 }

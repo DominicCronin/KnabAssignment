@@ -35,7 +35,7 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/cmc", async (CoinMarketCapQuotesClient client) =>
+app.MapGet("/cmc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
 {
     var result = await client.GetLatestQuoteAsync("BTC");
     return result.Match(

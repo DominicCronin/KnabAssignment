@@ -4,3 +4,9 @@ GET {{ExchangeRates.Server_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+
+GET {{ExchangeRates.Server_HostAddress}}/cmc/
+Accept: application/json
+
+###
