@@ -9,7 +9,7 @@ using MEO = Microsoft.Extensions.Options;
 namespace ExchangeRates.Server.Tests
 {
     [TestClass]
-    public sealed class CoinMarketCapClientTests
+    public sealed class CoinMarketCapIdMapClientTests
     {
         private readonly CoinMarketCapOptions _options = new()
         {
@@ -18,14 +18,14 @@ namespace ExchangeRates.Server.Tests
             CurrencySymbols = ["USD", "EUR"]
         };
         private MEO.IOptions<CoinMarketCapOptions>? _coinMarketCapOptions;
-        private CoinMarketCapClient? client;
+        private CoinMarketCapIdMapClient? client;
 
         [TestInitialize]
         public void Setup()
         {
             _coinMarketCapOptions = MEO.Options.Create(_options);
-            var logger = Substitute.For<ILogger<CoinMarketCapClient>>();
-            client = new CoinMarketCapClient(_coinMarketCapOptions, logger);
+            var logger = Substitute.For<ILogger<CoinMarketCapIdMapClient>>();
+            client = new CoinMarketCapIdMapClient(_coinMarketCapOptions, logger);
 
         }
 
@@ -36,7 +36,7 @@ namespace ExchangeRates.Server.Tests
             using var reader = new StreamReader(getFirstIdForSymbolJson!);
             var responseString = reader.ReadToEnd();
 
-            var result = CoinMarketCapClient.ParseIdMapResponse(responseString);
+            var result = CoinMarketCapIdMapClient.ParseIdMapResponse(responseString);
             
             Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T10:00:16.657Z"), result!.Status.Timestamp);
             Assert.AreEqual(0, result.Status.ErrorCode);
@@ -52,28 +52,6 @@ namespace ExchangeRates.Server.Tests
             Assert.AreEqual<DateTimeOffset>(DateTimeOffset.Parse("2024-12-27T09:45:00.000Z"), result.Data[0]!.LastHistoricalData);
 
             Assert.AreEqual(6, result.Data.Length);
-        }
-
-        [TestMethod]
-        public void Quote_WithSingleConvert_IsCorrectlyParsed()
-        {
-            var quotesJson = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExchangeRates.Server.Tests.cryptocurrency_quote_single_convert_response.json");
-            using var reader = new StreamReader(quotesJson!);
-            var responseString = reader.ReadToEnd();
-
-            var result = CoinMarketCapClient.ParseCoinMarketCapQuote(responseString);
-
-            Assert.IsTrue(result.IsSuccess);
-        }
-
-        [TestMethod]
-        public void Quote_WithMalformedJson_ReturnsFaulted()
-        {
-            string responseString = "}{";
-
-            var result = CoinMarketCapClient.ParseCoinMarketCapQuote(responseString);
-
-            Assert.IsTrue(result.IsFaulted);
         }
     }
 }

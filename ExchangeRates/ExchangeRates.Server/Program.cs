@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CoinMarketCapOptions>(builder.Configuration.GetSection(CoinMarketCapOptions.Section));
-builder.Services.AddScoped<CoinMarketCapClient>();
+builder.Services.AddScoped<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>();
+builder.Services.AddScoped<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>();
 
 builder.AddServiceDefaults();
 
@@ -33,7 +34,7 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/cmc", async (CoinMarketCapClient client) =>
+app.MapGet("/cmc", async (CoinMarketCapQuotesClient client) =>
 {
     var result = await client.GetLatestQuoteAsync("BTC");
     return result.Match(
