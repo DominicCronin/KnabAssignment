@@ -1,4 +1,5 @@
-﻿using ExchangeRates.Server.Options;
+﻿using ExchangeRates.Server.Models.CoinMarketCap;
+using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +16,7 @@ namespace ExchangeRates.Server.Tests
         {
             ApiKey = "Foo",
             BaseUrl = "https://example.com",
-            CurrencySymbols = ["USD", "EUR"]
+            TargetCurrencySymbol = "EUR"
         };
         private MEO.IOptions<CoinMarketCapOptions>? _coinMarketCapOptions;
         private CoinMarketCapQuotesClient? client;
@@ -38,9 +39,31 @@ namespace ExchangeRates.Server.Tests
             using var reader = new StreamReader(quotesJson!);
             var responseString = reader.ReadToEnd();
 
-            var result = CoinMarketCapQuotesClient.ParseCoinMarketCapQuote(responseString);
+            var result = client!.ParseCoinMarketCapQuote(responseString, "BTC");
+
+            result.IfSucc(result =>
+            {
+                var timestamp = result?.Status?.Timestamp;
+                Assert.IsNotNull(timestamp);
+                Assert.AreEqual(new DateTimeOffset(2024, 12, 29, 18, 00, 50, 436, new TimeSpan(0)), timestamp);
+
+                var price = result?.Quote?.Price;
+                Assert.IsNotNull(price);
+                Assert.AreEqual(89983.90482308931D, price);
+
+                var lastUpdated = result?.Quote?.LastUpdated;
+                Assert.IsNotNull(lastUpdated);
+                Assert.AreEqual(new DateTimeOffset(2024, 12, 29, 17, 59, 05, 0, new TimeSpan(0)), lastUpdated);
+                var symbol = result?.Symbol;
+                Assert.IsNotNull(symbol);
+                Assert.AreEqual("BTC", symbol);
+                var targetCurrencySymbol = result?.TargetCurrencySymbol;
+                Assert.IsNotNull(targetCurrencySymbol);
+                Assert.AreEqual("EUR", targetCurrencySymbol);
+            });
 
             Assert.IsTrue(result.IsSuccess);
+
         }
 
         [TestMethod]
@@ -48,7 +71,7 @@ namespace ExchangeRates.Server.Tests
         {
             string responseString = "}{";
 
-            var result = CoinMarketCapQuotesClient.ParseCoinMarketCapQuote(responseString);
+            var result = client!.ParseCoinMarketCapQuote(responseString, "BTC");
 
             Assert.IsTrue(result.IsFaulted);
         }

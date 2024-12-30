@@ -11,23 +11,6 @@ namespace ExchangeRates.Server.Tests
     [TestClass]
     public sealed class CoinMarketCapIdMapClientTests
     {
-        private readonly CoinMarketCapOptions _options = new()
-        {
-            ApiKey = "Foo",
-            BaseUrl = "https://example.com",
-            CurrencySymbols = ["USD", "EUR"]
-        };
-        private MEO.IOptions<CoinMarketCapOptions>? _coinMarketCapOptions;
-        private CoinMarketCapIdMapClient? client;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            _coinMarketCapOptions = MEO.Options.Create(_options);
-            var logger = Substitute.For<ILogger<CoinMarketCapIdMapClient>>();
-            client = new CoinMarketCapIdMapClient(_coinMarketCapOptions, logger);
-
-        }
 
         [TestMethod]
         public void IdMapResponse_IsCorrectlyParsed()

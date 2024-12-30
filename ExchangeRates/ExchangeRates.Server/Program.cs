@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CoinMarketCapOptions>(builder.Configuration.GetSection(CoinMarketCapOptions.Section));
+builder.Services.Configure<ExchangeRatesApiOptions>(builder.Configuration.GetSection(ExchangeRatesApiOptions.Section));
 builder.Services.AddScoped<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>();
 builder.Services.AddScoped<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>();
 
