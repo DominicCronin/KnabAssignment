@@ -1,5 +1,5 @@
 ﻿using ExchangeRates.Server.Exceptions;
-using ExchangeRates.Server.Models;
+using ExchangeRates.Server.Models.CoinMarketCap;
 using ExchangeRates.Server.Options;
 using LanguageExt.Common;
 using Microsoft.Extensions.Options;
@@ -58,7 +58,7 @@ namespace ExchangeRates.Server.Services
             string getHighestRankIdUri = BuildHighestRankingIdForSymbolUri(symbol);
             HttpResponseMessage response = await GetResponseFromAPI(getHighestRankIdUri);
             string responseString = await response.Content.ReadAsStringAsync();
-            IdMapResponse? model = ParseIdMapResponse(responseString);
+            CoinMarketCapIdMap? model = ParseIdMapResponse(responseString);
 
             return response switch
             {
@@ -71,9 +71,9 @@ namespace ExchangeRates.Server.Services
             };
         }
 
-        internal static IdMapResponse? ParseIdMapResponse(string responseString)
+        internal static CoinMarketCapIdMap? ParseIdMapResponse(string responseString)
         {
-            return JsonSerializer.Deserialize<IdMapResponse>(responseString, _jsonSerializerOptions);
+            return JsonSerializer.Deserialize<CoinMarketCapIdMap>(responseString, _jsonSerializerOptions);
         }
 
         internal static Result<CoinMarketCapQuote> ParseCoinMarketCapQuote(string responseString)

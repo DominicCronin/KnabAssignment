@@ -1,14 +1,14 @@
-﻿namespace ExchangeRates.Server.Models
+﻿namespace ExchangeRates.Server.Models.CoinMarketCap
 {
-    public class IdMapResponse
+    public class CoinMarketCapIdMap
     {
         public required CoinMarketCapStatus Status { get; set; }
-        public required IdMapResponseData[] Data { get; set; }
+        public required CoinMarketCapIdMapData[] Data { get; set; }
 
 
     }
 
-    public class IdMapResponseData
+    public class CoinMarketCapIdMapData
     {
         public int Id { get; set; }
 

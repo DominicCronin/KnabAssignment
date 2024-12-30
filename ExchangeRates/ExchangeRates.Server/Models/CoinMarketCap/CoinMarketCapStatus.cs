@@ -1,4 +1,4 @@
-﻿namespace ExchangeRates.Server.Models
+﻿namespace ExchangeRates.Server.Models.CoinMarketCap
 {
     public class CoinMarketCapStatus
     {
