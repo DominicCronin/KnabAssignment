@@ -65,7 +65,6 @@ namespace ExchangeRates.Server.Services
             if (responseString == null){ return new Result<CoinMarketCapQuote>(new ArgumentNullException(responseString));}
             if (id == null) { return new Result<CoinMarketCapQuote>(new ArgumentNullException(id));}
 
-            CoinMarketCapQuote quote = new();
             JsonNode? responseDom;
             try
             {
@@ -90,21 +89,26 @@ namespace ExchangeRates.Server.Services
             JsonNode? quoteNode = responseDom["data"]?[id]?["quote"]?[_options.TargetCurrencySymbol];                           
             if (quoteNode == null)
             {
-                _logger.LogError($"Quote element was null when querying data.id.quote.{_options.TargetCurrencySymbol}");
+                _logger.LogError("Quote element was null when querying data.id.quote.{TargetCurrencySymbol}", _options.TargetCurrencySymbol);
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Quote element was null"));
             }
 
+            CoinMarketCapQuote quote;
             try
             {
-                quote.Status = JsonSerializer.Deserialize<CoinMarketCapStatus>(statusNode.ToString(), _jsonSerializerOptions);
-                quote.Quote = JsonSerializer.Deserialize<CoinMarketCapTargetCurrencyQuote>(quoteNode.ToString(), _jsonSerializerOptions);
+                quote = new()
+                {
+                    CurrencyId = id,
+                    TargetCurrencySymbol = _options.TargetCurrencySymbol,
+                    Status = JsonSerializer.Deserialize<CoinMarketCapStatus>(statusNode.ToString(), _jsonSerializerOptions),
+                    Quote = JsonSerializer.Deserialize<CoinMarketCapTargetCurrencyQuote>(quoteNode.ToString(), _jsonSerializerOptions)
+
+                };
             }
             catch (JsonException ex)
             {
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Unable to parse response to models", ex));
             }
-            quote.CurrencyId = id;
-            quote.TargetCurrencySymbol = _options.TargetCurrencySymbol;
 
             return new Result<CoinMarketCapQuote>(quote);
         }

@@ -43,6 +43,14 @@ app.MapGet("/cmc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
         failure => Results.BadRequest(failure));
 });
 
+app.MapGet("/exc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
+{
+    var result = await client.GetLatestQuoteAsync("BTC");
+    return result.Match(
+        success => Results.Ok(success),
+        failure => Results.BadRequest(failure));
+});
+
 app.MapGet("/weatherforecast", () =>
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>

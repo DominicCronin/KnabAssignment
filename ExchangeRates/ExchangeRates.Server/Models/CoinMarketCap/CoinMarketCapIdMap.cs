@@ -1,23 +1,23 @@
 ﻿namespace ExchangeRates.Server.Models.CoinMarketCap
 {
-    public class CoinMarketCapIdMap
+    public record CoinMarketCapIdMap
     {
-        public required CoinMarketCapStatus Status { get; set; }
-        public required CoinMarketCapIdMapData[] Data { get; set; }
+        public required CoinMarketCapStatus Status { get; init; }
+        public required CoinMarketCapIdMapData[] Data { get; init; }
 
 
     }
 
-    public class CoinMarketCapIdMapData
+    public record CoinMarketCapIdMapData
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
 
-        public int Rank { get; set; }
-        public string? Name { get; set; }
+        public int Rank { get; init; }
+        public string? Name { get; init; }
 
-        public string? Symbol { get; set; }
-        public string? Slug { get; set; }
-        public DateTimeOffset FirstHistoricalData { get; set; }
-        public DateTimeOffset LastHistoricalData { get; set; }
+        public string? Symbol { get; init; }
+        public string? Slug { get; init; }
+        public DateTimeOffset FirstHistoricalData { get; init; }
+        public DateTimeOffset LastHistoricalData { get; init; }
     }
 }

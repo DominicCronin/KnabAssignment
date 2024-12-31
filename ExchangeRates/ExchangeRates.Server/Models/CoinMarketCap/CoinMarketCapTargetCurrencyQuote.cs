@@ -2,10 +2,10 @@
 
 namespace ExchangeRates.Server.Models.CoinMarketCap
 {
-    public class CoinMarketCapTargetCurrencyQuote
+    public record CoinMarketCapTargetCurrencyQuote
     {
-        public required double Price{ get; set; }
-        public DateTimeOffset? LastUpdated { get; set; }
+        public required double Price{ get; init; }
+        public DateTimeOffset? LastUpdated { get; init; }
 
     }
 }

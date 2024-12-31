@@ -2,11 +2,11 @@
 
 namespace ExchangeRates.Server.Models.CoinMarketCap
 {
-    public class CoinMarketCapQuote
+    public record CoinMarketCapQuote
     {
-        public string? CurrencyId { get; set; }
-        public string? TargetCurrencySymbol { get; set; }
-        public CoinMarketCapStatus? Status { get; set; }
-        public CoinMarketCapTargetCurrencyQuote? Quote { get; set; }
+        public string? CurrencyId { get; init; }
+        public string? TargetCurrencySymbol { get; init; }
+        public CoinMarketCapStatus? Status { get; init; }
+        public CoinMarketCapTargetCurrencyQuote? Quote { get; init; }
     }
 }

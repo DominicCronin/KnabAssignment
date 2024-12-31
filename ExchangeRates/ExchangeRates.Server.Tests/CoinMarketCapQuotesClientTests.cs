@@ -39,21 +39,22 @@ namespace ExchangeRates.Server.Tests
             using var reader = new StreamReader(quotesJson!);
             var responseString = reader.ReadToEnd();
 
-            var result = client!.ParseCoinMarketCapQuote(responseString, "BTC");
+            // Sample json uses "1" as the currency id (i.e. Bitcoin) and "EUR" as the target currency
+            var result = client!.ParseCoinMarketCapQuote(responseString, "1");
 
             result.IfSucc(result =>
             {
                 var timestamp = result?.Status?.Timestamp;
                 Assert.IsNotNull(timestamp);
-                Assert.AreEqual(new DateTimeOffset(2024, 12, 29, 18, 00, 50, 436, new TimeSpan(0)), timestamp);
+                Assert.AreEqual(new DateTimeOffset(2024, 12, 31, 09, 37, 03, 981, new TimeSpan(0)), timestamp);
 
                 var price = result?.Quote?.Price;
                 Assert.IsNotNull(price);
-                Assert.AreEqual(89983.90482308931D, price);
+                Assert.AreEqual(90056.7922057511D, price);
 
                 var lastUpdated = result?.Quote?.LastUpdated;
                 Assert.IsNotNull(lastUpdated);
-                Assert.AreEqual(new DateTimeOffset(2024, 12, 29, 17, 59, 05, 0, new TimeSpan(0)), lastUpdated);
+                Assert.AreEqual(new DateTimeOffset(2024, 12, 31, 09, 36, 04, 0, new TimeSpan(0)), lastUpdated);
                 var currencyId = result?.CurrencyId;
                 Assert.IsNotNull(currencyId);
                 Assert.AreEqual("1", currencyId);
