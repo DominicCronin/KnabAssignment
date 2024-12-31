@@ -17,10 +17,9 @@ namespace ExchangeRates.Server.Services
             ILogger<CoinMarketCapQuotesClient> logger,
             HttpClient httpClient) : CoinMarketCapClientBase, ICoinMarketCapQuotesClient
     {
-
         public async Task<Result<CoinMarketCapQuote>> GetLatestQuoteAsync(string symbol, CancellationToken cancellationToken)
         {
-            Result<string> id = await coinMarketCapIdMapClient.GetHighestRankIdForSymbol(symbol);
+            Result<string> id = await coinMarketCapIdMapClient.GetHighestRankIdForSymbolAsync(symbol, cancellationToken);
             return await id.Match(
             async id =>
             {
@@ -30,7 +29,7 @@ namespace ExchangeRates.Server.Services
 
                 return response switch
                 {
-                    { IsSuccessStatusCode: true } when (response.Content != null) => (await ReadAndParseLatestCoinMarketCapQuote(response, id)),
+                    { IsSuccessStatusCode: true } when (response.Content != null) => (await ReadAndParseLatestCoinMarketCapQuoteAsync(response, id)),
                     { IsSuccessStatusCode: true } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get id for symbol. Content was null. Status code: {response.StatusCode}")),
                     { IsSuccessStatusCode: false } => new Result<CoinMarketCapQuote>(new UpstreamServiceException($"Failed to get id for symbol. Status code: {response.StatusCode}"))
                 };
@@ -41,7 +40,7 @@ namespace ExchangeRates.Server.Services
             });
         }
 
-        private async Task<Result<CoinMarketCapQuote>> ReadAndParseLatestCoinMarketCapQuote(HttpResponseMessage response, string id)
+        private async Task<Result<CoinMarketCapQuote>> ReadAndParseLatestCoinMarketCapQuoteAsync(HttpResponseMessage response, string id)
         {
             string rawLatestQuote = await response.Content.ReadAsStringAsync();
             if (rawLatestQuote == null)

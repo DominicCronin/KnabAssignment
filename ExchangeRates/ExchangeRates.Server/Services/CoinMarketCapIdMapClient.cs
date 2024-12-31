@@ -16,7 +16,7 @@ namespace ExchangeRates.Server.Services
     {
 
 
-        public async Task<Result<string>> GetHighestRankIdForSymbol(string symbol, CancellationToken cancellationToken)
+        public async Task<Result<string>> GetHighestRankIdForSymbolAsync(string symbol, CancellationToken cancellationToken)
         {
             string getHighestRankIdUri = BuildHighestRankingIdForSymbolUri(symbol);
             logger.LogInformation("Getting highest ranking id for symbol {symbol}", symbol);            

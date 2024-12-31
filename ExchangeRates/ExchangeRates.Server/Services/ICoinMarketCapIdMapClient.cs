@@ -4,6 +4,6 @@ namespace ExchangeRates.Server.Services
 {
     public interface ICoinMarketCapIdMapClient
     {
-        Task<Result<string>> GetHighestRankIdForSymbol(string symbol, CancellationToken cancellationToken);
+        Task<Result<string>> GetHighestRankIdForSymbolAsync(string symbol, CancellationToken cancellationToken);
     }
 }

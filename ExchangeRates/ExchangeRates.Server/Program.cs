@@ -89,7 +89,7 @@ app.MapGet("/exc", async (HttpContext context, [FromServices] IExchangeRatesApiC
     LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
     try
     {
-        result = await client.GetRates(cancellationToken);
+        result = await client.GetRatesAsync(cancellationToken);
     }
     catch (OperationCanceledException)
     {
@@ -107,7 +107,7 @@ app.MapGet("/convert", async (HttpContext context, [FromServices] IExchangeRates
     LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
     try
     {
-        result = await client.GetRates(cancellationToken);
+        result = await client.GetRatesAsync(cancellationToken);
     }
     catch (OperationCanceledException)
     {

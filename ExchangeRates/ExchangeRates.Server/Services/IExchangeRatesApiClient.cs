@@ -5,6 +5,6 @@ namespace ExchangeRates.Server.Services
 {
     public interface IExchangeRatesApiClient
     {
-        Task<Result<RatesModel>> GetRates(CancellationToken cancellationToken);
+        Task<Result<RatesModel>> GetRatesAsync(CancellationToken cancellationToken);
     }
 }
