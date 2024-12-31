@@ -1,10 +1,11 @@
 ﻿namespace ExchangeRates.Server.Options
 {
-    public class ExchangeRatesApiOptions
+    public record ExchangeRatesApiOptions
     {
         public const string Section = "ExchangeRatesApi";
-        public string ApiKey { get; set; } = String.Empty;
-        public string BaseUrl { get; set; } = string.Empty;
-        public string[] CurrencySymbols { get; set; } = [];
+        public required string ApiKey { get; init; }
+        public required string BaseUrl { get; init; }
+        public required string[] TargetCurrencySymbols { get; init; }
+        public required string BaseCurrency { get; init; }
     }
 }
