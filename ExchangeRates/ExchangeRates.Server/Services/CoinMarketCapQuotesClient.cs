@@ -4,38 +4,29 @@ using ExchangeRates.Server.Options;
 using LanguageExt.Common;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
 
 namespace ExchangeRates.Server.Services
 {
-    [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Primary constructor not suitable for this scenario")]
-    public class CoinMarketCapQuotesClient : CoinMarketCapClientBase, ICoinMarketCapQuotesClient
-    {
-        private readonly CoinMarketCapOptions _options;
-        private readonly ILogger<CoinMarketCapQuotesClient> _logger;
-        private readonly ICoinMarketCapIdMapClient _coinMarketCapIdMapClient;
-
-        public CoinMarketCapQuotesClient(
+    public class CoinMarketCapQuotesClient(
             ICoinMarketCapIdMapClient coinMarketCapIdMapClient,
-            IOptions<CoinMarketCapOptions> options, 
-            ILogger<CoinMarketCapQuotesClient> logger) : base(options)
-        {
-            _options = options.Value;
-            _logger = logger;
-            _coinMarketCapIdMapClient = coinMarketCapIdMapClient;
-        }
+            IOptions<CoinMarketCapOptions> options,
+            ILogger<CoinMarketCapQuotesClient> logger,
+            HttpClient httpClient) : CoinMarketCapClientBase, ICoinMarketCapQuotesClient
+    {
 
         public async Task<Result<CoinMarketCapQuote>> GetLatestQuoteAsync(string symbol)
         {
-            Result<string> id = await _coinMarketCapIdMapClient.GetHighestRankIdForSymbol(symbol);
+            Result<string> id = await coinMarketCapIdMapClient.GetHighestRankIdForSymbol(symbol);
             return await id.Match(
             async id =>
             {
-                _logger.LogInformation("Got highest ranking id for symbol {symbol}", symbol);
+                logger.LogInformation("Got highest ranking id for symbol {symbol}", symbol);
                 string getUriLatestQuote = BuildLatestQuoteRequestUri(id);
-                var response = await GetResponseFromAPI(getUriLatestQuote);
+                var response = await httpClient.GetAsync(getUriLatestQuote);
 
                 return response switch
                 {
@@ -86,10 +77,10 @@ namespace ExchangeRates.Server.Services
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Status element was null"));
             }
 
-            JsonNode? quoteNode = responseDom["data"]?[id]?["quote"]?[_options.TargetCurrencySymbol];                           
+            JsonNode? quoteNode = responseDom["data"]?[id]?["quote"]?[options.Value.TargetCurrencySymbol];                           
             if (quoteNode == null)
             {
-                _logger.LogError("Quote element was null when querying data.id.quote.{TargetCurrencySymbol}", _options.TargetCurrencySymbol);
+                logger.LogError("Quote element was null when querying data.id.quote.{TargetCurrencySymbol}", options.Value.TargetCurrencySymbol);
                 return new Result<CoinMarketCapQuote>(new UpstreamServiceException("Quote element was null"));
             }
 
@@ -99,7 +90,7 @@ namespace ExchangeRates.Server.Services
                 quote = new()
                 {
                     CurrencyId = id,
-                    TargetCurrencySymbol = _options.TargetCurrencySymbol,
+                    TargetCurrencySymbol = options.Value.TargetCurrencySymbol,
                     Status = JsonSerializer.Deserialize<CoinMarketCapStatus>(statusNode.ToString(), _jsonSerializerOptions),
                     Quote = JsonSerializer.Deserialize<CoinMarketCapTargetCurrencyQuote>(quoteNode.ToString(), _jsonSerializerOptions)
 
@@ -115,12 +106,12 @@ namespace ExchangeRates.Server.Services
 
         private string BuildLatestQuoteRequestUri(string id)
         {
-            UriBuilder uriBuilder = new(_options.BaseUrl);
+            UriBuilder uriBuilder = new(options.Value.BaseUrl);
             uriBuilder.Path += "v2/cryptocurrency/quotes/latest";
 
             var queryString = HttpUtility.ParseQueryString(string.Empty);
             queryString["id"] = id;
-            queryString["convert"] = _options.TargetCurrencySymbol;
+            queryString["convert"] = options.Value.TargetCurrencySymbol;
             uriBuilder.Query = queryString.ToString();
             return uriBuilder.ToString();
         }

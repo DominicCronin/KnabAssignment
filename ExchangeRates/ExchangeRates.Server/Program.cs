@@ -1,13 +1,43 @@
 using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CoinMarketCapOptions>(builder.Configuration.GetSection(CoinMarketCapOptions.Section));
 builder.Services.Configure<ExchangeRatesApiOptions>(builder.Configuration.GetSection(ExchangeRatesApiOptions.Section));
+
 builder.Services.AddScoped<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>();
 builder.Services.AddScoped<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>();
+
+builder.Services.AddScoped<IExchangeRatesApiClient, ExchangeRatesApiClient>();
+
+// TODO - DRY
+builder.Services.AddHttpClient<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<CoinMarketCapOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", options.ApiKey);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddHttpClient<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<CoinMarketCapOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", options.ApiKey);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddHttpClient<IExchangeRatesApiClient, ExchangeRatesApiClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<ExchangeRatesApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
 
 builder.AddServiceDefaults();
 
@@ -43,9 +73,9 @@ app.MapGet("/cmc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
         failure => Results.BadRequest(failure));
 });
 
-app.MapGet("/exc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
+app.MapGet("/exc", async ([FromServices] IExchangeRatesApiClient client) =>
 {
-    var result = await client.GetLatestQuoteAsync("BTC");
+    var result = await client.GetRates();
     return result.Match(
         success => Results.Ok(success),
         failure => Results.BadRequest(failure));

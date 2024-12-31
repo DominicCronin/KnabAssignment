@@ -5,12 +5,12 @@ namespace ExchangeRates.Server.Models.ExchangeRatesAPI
 {
     public record RatesModel
     {
-        public bool Success { get; init; }
+        public required bool Success { get; init; }
 
         [JsonConverter(typeof(UnixEpochSecondsConverter))]
-        public DateTimeOffset Timestamp { get; init; }
-        public string Base { get; set; }
-        public DateOnly Date { get; set; }
-        public Dictionary<string, decimal> Rates { get; set; }
+        public required DateTimeOffset Timestamp { get; init; }
+        public required string Base { get; init; }
+        public required DateOnly Date { get; init; }
+        public required Dictionary<string, decimal> Rates { get; init; }
     }
 }

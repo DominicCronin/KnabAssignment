@@ -7,6 +7,12 @@ namespace ExchangeRates.Server.Tests;
 [TestClass]
 public class RatesModelTests
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+    };
+
     [TestMethod]
     public void Deserialization_fills_fields_correctly()
     {
@@ -26,19 +32,15 @@ public class RatesModelTests
         }
         ";
 
-        JsonSerializerOptions jsonSerializerOptions = new() { 
-                PropertyNameCaseInsensitive = true, 
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
-        };
 
-        var ratesModel = JsonSerializer.Deserialize<RatesModel>(inputJson, jsonSerializerOptions);
+
+        var ratesModel = JsonSerializer.Deserialize<RatesModel>(inputJson, _jsonSerializerOptions);
 
         Assert.IsNotNull(ratesModel);
         Assert.AreEqual(true, ratesModel.Success);
         Assert.AreEqual(DateTimeOffset.FromUnixTimeSeconds(1735640944), ratesModel.Timestamp);
         Assert.AreEqual("EUR", ratesModel.Base);
         Assert.AreEqual(new DateOnly(2024, 12, 31), ratesModel.Date);
-        Assert.IsNotNull(ratesModel.Rates);
         Assert.AreEqual(4, ratesModel.Rates.Count);
         Assert.AreEqual(1.041178M, ratesModel.Rates["USD"]);
         Assert.AreEqual(6.438957M, ratesModel.Rates["BRL"]);

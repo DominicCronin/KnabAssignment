@@ -10,3 +10,8 @@ GET {{ExchangeRates.Server_HostAddress}}/cmc/
 Accept: application/json
 
 ###
+
+GET {{ExchangeRates.Server_HostAddress}}/exc/
+Accept: application/json
+
+###

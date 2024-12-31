@@ -27,7 +27,8 @@ namespace ExchangeRates.Server.Tests
             _coinMarketCapOptions = MEO.Options.Create(_options);
             var logger = Substitute.For<ILogger<CoinMarketCapQuotesClient>>();
             ICoinMarketCapIdMapClient mockCoinMarketCapIdMapClient = Substitute.For<ICoinMarketCapIdMapClient>();
-            client = new CoinMarketCapQuotesClient(mockCoinMarketCapIdMapClient, _coinMarketCapOptions, logger);
+            var mockHttpClient = Substitute.For<HttpClient>();
+            client = new CoinMarketCapQuotesClient(mockCoinMarketCapIdMapClient, _coinMarketCapOptions, logger, mockHttpClient);
 
         }
 
