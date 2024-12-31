@@ -90,9 +90,12 @@ namespace ExchangeRates.Server.Services
                 {
                     CurrencyId = id,
                     TargetCurrencySymbol = options.Value.TargetCurrencySymbol,
-                    Status = JsonSerializer.Deserialize<CoinMarketCapStatus>(statusNode.ToString(), _jsonSerializerOptions),
-                    Quote = JsonSerializer.Deserialize<CoinMarketCapTargetCurrencyQuote>(quoteNode.ToString(), _jsonSerializerOptions)
-
+                    // for example, if the json is "null" then the deserialization will return null, but we don't expect this
+                    // and doing it like this lets us create an immutable record.
+                    Status = JsonSerializer.Deserialize<CoinMarketCapStatus>(statusNode.ToString(), _jsonSerializerOptions) 
+                        ?? throw new InvalidOperationException("Deserialization resulted in null"),
+                    Quote = JsonSerializer.Deserialize<CoinMarketCapTargetCurrencyQuote>(quoteNode.ToString(), _jsonSerializerOptions) 
+                        ?? throw new InvalidOperationException("Deserialization resulted in null")
                 };
             }
             catch (JsonException ex)

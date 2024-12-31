@@ -15,6 +15,8 @@ builder.Services.AddScoped<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient
 
 builder.Services.AddScoped<IExchangeRatesApiClient, ExchangeRatesApiClient>();
 
+builder.Services.AddScoped<ICryptoCurrencyConverter, CryptoCurrencyConverter>();
+
 // TODO - DRY
 builder.Services.AddHttpClient<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>((sp, client) =>
 {
@@ -101,13 +103,13 @@ app.MapGet("/exc", async (HttpContext context, [FromServices] IExchangeRatesApiC
         failure => Results.BadRequest(failure));
 });
 
-app.MapGet("/convert", async (HttpContext context, [FromServices] IExchangeRatesApiClient client) =>
+app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrencyConverter client) =>
 {
     var cancellationToken = context.RequestAborted;
-    LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
+    LanguageExt.Common.Result<ExchangeRates.Server.Models.CryptoToFiatsConversion> result;
     try
     {
-        result = await client.GetRatesAsync(cancellationToken);
+        result = await client.GetConversionAsync("BTC", cancellationToken);
     }
     catch (OperationCanceledException)
     {

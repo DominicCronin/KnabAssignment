@@ -15,3 +15,8 @@ GET {{ExchangeRates.Server_HostAddress}}/exc/
 Accept: application/json
 
 ###
+
+GET {{ExchangeRates.Server_HostAddress}}/convert/
+Accept: application/json
+
+###

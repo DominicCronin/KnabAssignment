@@ -19,7 +19,7 @@ namespace ExchangeRates.Server.Services
         {
             string ratesUri = BuildRatesUri();
             HttpResponseMessage response = await client.GetAsync(ratesUri, cancellationToken);
-            string responseString = await response.Content.ReadAsStringAsync();
+            string responseString = await response.Content.ReadAsStringAsync(cancellationToken);
 
             return response switch
             {

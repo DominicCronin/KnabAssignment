@@ -11,6 +11,6 @@ namespace ExchangeRates.Server.Models.ExchangeRatesAPI
         public required DateTimeOffset Timestamp { get; init; }
         public required string Base { get; init; }
         public required DateOnly Date { get; init; }
-        public required Dictionary<string, decimal> Rates { get; init; }
+        public required Dictionary<string, double> Rates { get; init; }
     }
 }

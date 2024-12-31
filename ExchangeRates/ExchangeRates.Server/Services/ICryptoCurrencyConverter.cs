@@ -1,8 +1,11 @@
 ﻿
+using ExchangeRates.Server.Models;
+using LanguageExt.Common;
+
 namespace ExchangeRates.Server.Services
 {
     public interface ICryptoCurrencyConverter
     {
-        Task<decimal> GetConversionAsync(string cryptoCurrency, CancellationToken cancellationToken);
+        Task<Result<CryptoToFiatsConversion>> GetConversionAsync(string cryptoCurrency, CancellationToken cancellationToken);
     }
 }

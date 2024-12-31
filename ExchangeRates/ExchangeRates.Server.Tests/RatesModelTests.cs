@@ -42,10 +42,10 @@ public class RatesModelTests
         Assert.AreEqual("EUR", ratesModel.Base);
         Assert.AreEqual(new DateOnly(2024, 12, 31), ratesModel.Date);
         Assert.AreEqual(4, ratesModel.Rates.Count);
-        Assert.AreEqual(1.041178M, ratesModel.Rates["USD"]);
-        Assert.AreEqual(6.438957M, ratesModel.Rates["BRL"]);
-        Assert.AreEqual(0.829288M, ratesModel.Rates["GBP"]);
-        Assert.AreEqual(1.674553M, ratesModel.Rates["AUD"]);
+        Assert.AreEqual(1.041178D, ratesModel.Rates["USD"]);
+        Assert.AreEqual(6.438957D, ratesModel.Rates["BRL"]);
+        Assert.AreEqual(0.829288D, ratesModel.Rates["GBP"]);
+        Assert.AreEqual(1.674553D, ratesModel.Rates["AUD"]);
 
     }
 }

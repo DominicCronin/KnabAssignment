@@ -1,28 +1,60 @@
-﻿namespace ExchangeRates.Server.Services
-{
-    public class CryptoCurrencyConverter(ICoinMarketCapQuotesClient coinMarketCapQuotesClient, IExchangeRatesApiClient exchangeRatesApiClient, Logger<CryptoCurrencyConverter> logger) : ICryptoCurrencyConverter
-    {
+﻿using ExchangeRates.Server.Models;
+using ExchangeRates.Server.Models.CoinMarketCap;
+using ExchangeRates.Server.Models.ExchangeRatesAPI;
+using LanguageExt.Common;
 
-        public async Task<decimal> GetConversionAsync(string cryptoCurrencySymbol, CancellationToken cancellationToken)
+namespace ExchangeRates.Server.Services
+{
+    public class CryptoCurrencyConverter(ICoinMarketCapQuotesClient coinMarketCapQuotesClient, IExchangeRatesApiClient exchangeRatesApiClient, ILogger<CryptoCurrencyConverter> logger) : ICryptoCurrencyConverter
+    {
+        public async Task<Result<CryptoToFiatsConversion>> GetConversionAsync(string cryptoCurrencySymbol, CancellationToken cancellationToken)
         {
             var coinMarketCapQuote = await coinMarketCapQuotesClient.GetLatestQuoteAsync(cryptoCurrencySymbol, cancellationToken);
-            if (coinMarketCapQuote == null)
+            return await coinMarketCapQuote.Match(
+                async latestQuote =>
+                {
+                    var exchangeRates = await exchangeRatesApiClient.GetRatesAsync(cancellationToken);
+                    return exchangeRates.Match(
+                        rates =>
+                        {
+                            CryptoToFiatsConversion conversion = MergeQuoteAndRates(cryptoCurrencySymbol, latestQuote, rates);
+                            return new Result<CryptoToFiatsConversion>(conversion);
+                        },
+                        error =>
+                        {
+                            logger.LogWarning("Failed to get exchange rates");
+                            return new Result<CryptoToFiatsConversion>(error);
+                        }
+                    );
+                },
+                error =>
+                {
+                    logger.LogWarning("Failed to get quote for {CryptoCurrency}", cryptoCurrencySymbol);
+                    return Task.FromResult(new Result<CryptoToFiatsConversion>(error));
+                }
+            );
+        }
+
+        internal CryptoToFiatsConversion MergeQuoteAndRates(string cryptoCurrencySymbol, CoinMarketCapQuote latestQuote, RatesModel rates)
+        {
+            logger.LogInformation("Merging quote and rates for {CryptoCurrency}", cryptoCurrencySymbol);
+            CryptoToFiatsConversion conversion = new() { CryptoCurrencySymbol = cryptoCurrencySymbol };
+            if (rates.Base != latestQuote.TargetCurrencySymbol)
             {
-                logger.LogWarning("Failed to get quote for {CryptoCurrency}", cryptoCurrencySymbol);
-                return 0;
+                throw new InvalidOperationException("Base currency does not match the target currency symbol");
             }
-            var exchangeRates = await exchangeRatesApiClient.GetRatesAsync(cancellationToken);
-            if (exchangeRates == null)
+
+            // First add the crypto to base currency conversion
+            // If symbol is BTC and price is 90056, then the conversion is 1 BTC = 90056 EUR
+            conversion.FiatConversions.Add(latestQuote.TargetCurrencySymbol, latestQuote.Quote.Price);
+            // Now we can add the other currencies. 
+            foreach (var rate in rates.Rates)
             {
-                logger.LogWarning("Failed to get exchange rates");
-                return 0;
+                // Now convert from EUR to USD or whatever
+                conversion.FiatConversions.Add(rate.Key, latestQuote.Quote.Price * rate.Value);
             }
-            if (!exchangeRates.Rates.TryGetValue(currency, out var exchangeRate))
-            {
-                logger.LogWarning("Failed to get exchange rate for {Currency}", currency);
-                return 0;
-            }
-            return amount * (decimal)coinMarketCapQuote.Price * exchangeRate;
+
+            return conversion;
         }
     }
 }

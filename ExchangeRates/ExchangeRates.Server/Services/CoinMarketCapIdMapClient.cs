@@ -21,7 +21,7 @@ namespace ExchangeRates.Server.Services
             string getHighestRankIdUri = BuildHighestRankingIdForSymbolUri(symbol);
             logger.LogInformation("Getting highest ranking id for symbol {symbol}", symbol);            
             HttpResponseMessage response = await httpClient.GetAsync(getHighestRankIdUri, cancellationToken);
-            string responseString = await response.Content.ReadAsStringAsync();
+            string responseString = await response.Content.ReadAsStringAsync(cancellationToken);
             Result<CoinMarketCapIdMap> modelResult = ParseIdMapResponse(responseString);
 
             var matchResult = modelResult.Match(
