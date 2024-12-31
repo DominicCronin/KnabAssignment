@@ -15,10 +15,10 @@ namespace ExchangeRates.Server.Services
 
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
-        public async Task<Result<RatesModel>> GetRates()
+        public async Task<Result<RatesModel>> GetRates(CancellationToken cancellationToken)
         {
             string ratesUri = BuildRatesUri();
-            HttpResponseMessage response = await client.GetAsync(ratesUri);
+            HttpResponseMessage response = await client.GetAsync(ratesUri, cancellationToken);
             string responseString = await response.Content.ReadAsStringAsync();
 
             return response switch

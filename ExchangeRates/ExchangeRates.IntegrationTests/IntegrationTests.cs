@@ -3,7 +3,7 @@ namespace ExchangeRates.IntegrationTests;
 [TestClass]
 public class IntegrationTests
 {
-
+    // Another bit of YAGNI, but cool to see how Aspire gets this done.
     [TestMethod]
     public async Task GetWebResourceRootReturnsOkStatusCode()
     {

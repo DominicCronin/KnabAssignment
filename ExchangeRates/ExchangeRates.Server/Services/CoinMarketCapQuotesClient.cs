@@ -18,7 +18,7 @@ namespace ExchangeRates.Server.Services
             HttpClient httpClient) : CoinMarketCapClientBase, ICoinMarketCapQuotesClient
     {
 
-        public async Task<Result<CoinMarketCapQuote>> GetLatestQuoteAsync(string symbol)
+        public async Task<Result<CoinMarketCapQuote>> GetLatestQuoteAsync(string symbol, CancellationToken cancellationToken)
         {
             Result<string> id = await coinMarketCapIdMapClient.GetHighestRankIdForSymbol(symbol);
             return await id.Match(
@@ -26,7 +26,7 @@ namespace ExchangeRates.Server.Services
             {
                 logger.LogInformation("Got highest ranking id for symbol {symbol}", symbol);
                 string getUriLatestQuote = BuildLatestQuoteRequestUri(id);
-                var response = await httpClient.GetAsync(getUriLatestQuote);
+                var response = await httpClient.GetAsync(getUriLatestQuote, cancellationToken);
 
                 return response switch
                 {

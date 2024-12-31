@@ -16,11 +16,11 @@ namespace ExchangeRates.Server.Services
     {
 
 
-        public async Task<Result<string>> GetHighestRankIdForSymbol(string symbol)
+        public async Task<Result<string>> GetHighestRankIdForSymbol(string symbol, CancellationToken cancellationToken)
         {
             string getHighestRankIdUri = BuildHighestRankingIdForSymbolUri(symbol);
             logger.LogInformation("Getting highest ranking id for symbol {symbol}", symbol);            
-            HttpResponseMessage response = await httpClient.GetAsync(getHighestRankIdUri);
+            HttpResponseMessage response = await httpClient.GetAsync(getHighestRankIdUri, cancellationToken);
             string responseString = await response.Content.ReadAsStringAsync();
             Result<CoinMarketCapIdMap> modelResult = ParseIdMapResponse(responseString);
 

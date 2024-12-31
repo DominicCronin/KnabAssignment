@@ -3,6 +3,7 @@ using ExchangeRates.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
+using System.Threading;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,21 +66,59 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/cmc", async ([FromServices] ICoinMarketCapQuotesClient client) =>
+app.MapGet("/cmc", async (HttpContext context, [FromServices] ICoinMarketCapQuotesClient client) =>
 {
-    var result = await client.GetLatestQuoteAsync("BTC");
+    var cancellationToken = context.RequestAborted;
+    LanguageExt.Common.Result<ExchangeRates.Server.Models.CoinMarketCap.CoinMarketCapQuote> result;     
+    try
+    {
+        result = await client.GetLatestQuoteAsync("BTC", cancellationToken);
+    }
+    catch (OperationCanceledException)
+    {
+        return Results.StatusCode(StatusCodes.Status499ClientClosedRequest);
+    }
     return result.Match(
         success => Results.Ok(success),
         failure => Results.BadRequest(failure));
 });
 
-app.MapGet("/exc", async ([FromServices] IExchangeRatesApiClient client) =>
+app.MapGet("/exc", async (HttpContext context, [FromServices] IExchangeRatesApiClient client) =>
 {
-    var result = await client.GetRates();
+    var cancellationToken = context.RequestAborted;
+    LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
+    try
+    {
+        result = await client.GetRates(cancellationToken);
+    }
+    catch (OperationCanceledException)
+    {
+        return  Results.StatusCode(StatusCodes.Status499ClientClosedRequest);
+    }
+
     return result.Match(
         success => Results.Ok(success),
         failure => Results.BadRequest(failure));
 });
+
+app.MapGet("/convert", async (HttpContext context, [FromServices] IExchangeRatesApiClient client) =>
+{
+    var cancellationToken = context.RequestAborted;
+    LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
+    try
+    {
+        result = await client.GetRates(cancellationToken);
+    }
+    catch (OperationCanceledException)
+    {
+        return Results.StatusCode(StatusCodes.Status499ClientClosedRequest);
+    }
+
+    return result.Match(
+        success => Results.Ok(success),
+        failure => Results.BadRequest(failure));
+});
+
 
 app.MapGet("/weatherforecast", () =>
 {
