@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import SymbolForm from './Components/SymbolForm';
+import Conversion from './Components/Conversion';
 
 interface Forecast {
     date: string;
@@ -10,6 +12,7 @@ interface Forecast {
 
 function App() {
     const [forecasts, setForecasts] = useState<Forecast[]>();
+    const [symbol, setSymbol] = useState<string>('');
 
     useEffect(() => {
         populateWeatherData();
@@ -39,12 +42,21 @@ function App() {
         </table>;
 
     return (
+        <>
         <div>
             <h1 id="tableLabel">Weather forecast from App.tsx</h1>
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
-        </div>
+            </div>
+
+            <SymbolForm handleSubmittedSymbol={setSymbol} />
+            <Conversion symbol={symbol} />
+        </>
     );
+
+    async function handleSubmittedSymbol(symbol: string) {
+        const response = await fetch('convert')
+    }
 
     async function populateWeatherData() {
         const response = await fetch('weatherforecast');

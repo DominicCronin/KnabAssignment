@@ -17,22 +17,16 @@ builder.Services.AddScoped<IExchangeRatesApiClient, ExchangeRatesApiClient>();
 
 builder.Services.AddScoped<ICryptoCurrencyConverter, CryptoCurrencyConverter>();
 
-// TODO - DRY
-builder.Services.AddHttpClient<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>((sp, client) =>
+Action<IServiceProvider, HttpClient>  configureCoinMarketCapClient = (sp, client) =>
 {
     var options = sp.GetRequiredService<IOptions<CoinMarketCapOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl);
     client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", options.ApiKey);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+};
 
-builder.Services.AddHttpClient<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>((sp, client) =>
-{
-    var options = sp.GetRequiredService<IOptions<CoinMarketCapOptions>>().Value;
-    client.BaseAddress = new Uri(options.BaseUrl);
-    client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", options.ApiKey);
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+builder.Services.AddHttpClient<ICoinMarketCapIdMapClient, CoinMarketCapIdMapClient>(configureCoinMarketCapClient);
+builder.Services.AddHttpClient<ICoinMarketCapQuotesClient, CoinMarketCapQuotesClient>(configureCoinMarketCapClient);
 
 builder.Services.AddHttpClient<IExchangeRatesApiClient, ExchangeRatesApiClient>((sp, client) =>
 {
