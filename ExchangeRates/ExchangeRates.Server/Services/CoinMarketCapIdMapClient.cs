@@ -2,8 +2,10 @@
 using ExchangeRates.Server.Models.CoinMarketCap;
 using ExchangeRates.Server.Options;
 using LanguageExt.Common;
+using LanguageExt.Pipes;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace ExchangeRates.Server.Services
