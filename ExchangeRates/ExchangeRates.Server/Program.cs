@@ -1,3 +1,4 @@
+using ExchangeRates.Server.Exceptions;
 using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -119,7 +120,12 @@ app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrenc
 
     return result.Match(
         success => Results.Ok(success),
-        failure => Results.BadRequest(failure));
+        failure => {
+            return failure switch {
+                UpstreamBadRequestException ex => Results.BadRequest($"Unable to process a request to convert {symbol}"),                                
+                _ => Results.InternalServerError(failure)
+            };
+        });
 });
 
 

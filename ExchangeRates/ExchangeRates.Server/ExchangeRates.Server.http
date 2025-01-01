@@ -16,7 +16,7 @@ Accept: application/json
 
 ###
 
-GET {{ExchangeRates.Server_HostAddress}}/convert?symbol=ABC
+GET {{ExchangeRates.Server_HostAddress}}/convert?symbol=YTI
 Accept: application/json
 
 ###

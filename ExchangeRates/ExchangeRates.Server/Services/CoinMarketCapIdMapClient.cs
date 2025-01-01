@@ -2,11 +2,13 @@
 using ExchangeRates.Server.Models.CoinMarketCap;
 using ExchangeRates.Server.Options;
 using LanguageExt.Common;
+using LanguageExt.Pipes;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace ExchangeRates.Server.Services
@@ -22,24 +24,46 @@ namespace ExchangeRates.Server.Services
             logger.LogInformation("Getting highest ranking id for symbol {symbol}", symbol);            
             HttpResponseMessage response = await httpClient.GetAsync(getHighestRankIdUri, cancellationToken);
             string responseString = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return HandleErrorResponse(responseString);
+            }
+
             Result<CoinMarketCapIdMap> modelResult = ParseIdMapResponse(responseString);
 
-            var matchResult = modelResult.Match(
+            return modelResult.Match(
                 result => {
-                    return response switch
-                    {
-                        { IsSuccessStatusCode: true } when result is not null && result.Data.Length > 0 => result.Data[0].Id.ToString(),
-                        { IsSuccessStatusCode: true } => new Result<string>(new InvalidOperationException($"Status was success. Expected mapping data was not present.")),
-                        { IsSuccessStatusCode: false } when (result is not null) && (result.Status.ErrorCode == StatusCodes.Status400BadRequest)
-                            => new Result<string>(new UpstreamBadRequestException($"Error from cryptocurrency service: {result.Status.ErrorMessage}")),
-                        { IsSuccessStatusCode: false } => new Result<string>(new UpstreamServiceException($"Failed to get highest ranking id for symbol.", (int)response.StatusCode)),
-                        _ => new Result<string>(new InvalidOperationException($"Unexpected response while Getting HighestRankIdForSymbol"))
-                    };
+                    return result.Data[0].Id.ToString();
                 },
-                    exception => new Result<string>(exception)
-                );
-            return matchResult;
+                exception => new Result<string>(exception)
+             );            
+        }
 
+        private Result<string> HandleErrorResponse(string responseString)
+        {
+
+            CoinMarketCapError? error;
+            try
+            {
+                error = JsonSerializer.Deserialize<CoinMarketCapError>(responseString, _jsonSerializerOptions);
+            }
+            catch (JsonException ex)
+            {
+                return new Result<string>(new UpstreamServiceException("Failed to parse error response from upstream service", ex));
+            }
+
+            if (error == null)
+            {
+                return new Result<string>(new UpstreamServiceException("Failed to parse error response from upstream service. Null returned"));
+            }
+
+            if (error.Status.ErrorCode == StatusCodes.Status400BadRequest)
+            {
+                return new Result<string>(new UpstreamBadRequestException($"Error from cryptocurrency service: {error.Status.ErrorMessage}"));
+            }
+
+            return new Result<string>(new UpstreamServiceException("Failed to parse error response from upstream service"));
         }
 
         internal static Result<CoinMarketCapIdMap> ParseIdMapResponse(string responseString)
