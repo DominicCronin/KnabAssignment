@@ -16,7 +16,6 @@ public class RatesModelTests
     [TestMethod]
     public void Deserialization_fills_fields_correctly()
     {
-
         string inputJson = @"
         {
             ""success"": true,
@@ -32,8 +31,6 @@ public class RatesModelTests
         }
         ";
 
-
-
         var ratesModel = JsonSerializer.Deserialize<RatesModel>(inputJson, _jsonSerializerOptions);
 
         Assert.IsNotNull(ratesModel);
@@ -46,6 +43,5 @@ public class RatesModelTests
         Assert.AreEqual(6.438957D, ratesModel.Rates["BRL"]);
         Assert.AreEqual(0.829288D, ratesModel.Rates["GBP"]);
         Assert.AreEqual(1.674553D, ratesModel.Rates["AUD"]);
-
     }
 }
