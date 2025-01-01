@@ -56,6 +56,10 @@ export default defineConfig(({mode })=>{
                 '^/weatherforecast': {
                     target,
                     secure: false
+                },
+                '^/convert': {
+                    target,
+                    secure: false
                 }
             },
             https: {
