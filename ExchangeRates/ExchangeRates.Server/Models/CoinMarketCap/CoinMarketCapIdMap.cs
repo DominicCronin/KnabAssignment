@@ -1,4 +1,6 @@
-﻿namespace ExchangeRates.Server.Models.CoinMarketCap
+﻿using System.Text.Json.Serialization;
+
+namespace ExchangeRates.Server.Models.CoinMarketCap
 {
     public record CoinMarketCapIdMap
     {
@@ -11,8 +13,8 @@
     public record CoinMarketCapIdMapData
     {
         public int Id { get; init; }
-
-        public int Rank { get; init; }
+       
+        public int? Rank { get; init; }
         public string? Name { get; init; }
 
         public string? Symbol { get; init; }

@@ -1,0 +1,138 @@
+{
+    "status": {
+        "timestamp": "2025-01-01T18:42:26.649Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 17,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": [
+        {
+            "id": 24497,
+            "rank": 5925,
+            "name": "ABC PoS Pool",
+            "symbol": "ABC",
+            "slug": "abc-pos-pool",
+            "is_active": 1,
+            "status": 1,
+            "first_historical_data": "2023-02-06T10:45:00.000Z",
+            "last_historical_data": "2025-01-01T18:35:00.000Z",
+            "platform": {
+                "id": 41,
+                "name": "Conflux",
+                "symbol": "CFX",
+                "slug": "conflux-network",
+                "token_address": "0x905f2202003453006eaf975699545f2e909079b8"
+            }
+        },
+        {
+            "id": 23966,
+            "rank": 6719,
+            "name": "Angry Bulls Club",
+            "symbol": "ABC",
+            "slug": "angry-bulls-club",
+            "is_active": 1,
+            "status": 1,
+            "first_historical_data": "2023-03-06T21:30:00.000Z",
+            "last_historical_data": "2025-01-01T18:35:00.000Z",
+            "platform": {
+                "id": 25,
+                "name": "Polygon",
+                "symbol": "MATIC",
+                "slug": "polygon",
+                "token_address": "0xce899f5fcf55b0c1d7478910f812cfe68c5bcf0f"
+            }
+        },
+        {
+            "id": 940,
+            "rank": null,
+            "name": "Asset Backed Coin",
+            "symbol": "ABC",
+            "slug": "asset-backed-coin",
+            "is_active": 0,
+            "status": 4,
+            "platform": null
+        },
+        {
+            "id": 1256,
+            "rank": null,
+            "name": "Alphabit",
+            "symbol": "ABC",
+            "slug": "alphabitcoinfund",
+            "is_active": 0,
+            "status": 4,
+            "platform": {
+                "id": 1,
+                "name": "Ethereum",
+                "symbol": "ETH",
+                "slug": "ethereum",
+                "token_address": "0x036407F23D5E1C1486F7488332CF54bf06E5F09F"
+            }
+        },
+        {
+            "id": 14933,
+            "rank": null,
+            "name": "Abell Coin",
+            "symbol": "ABC",
+            "slug": "abell-coin",
+            "is_active": 0,
+            "status": 2,
+            "platform": {
+                "id": 14,
+                "name": "BNB Smart Chain (BEP20)",
+                "symbol": "BNB",
+                "slug": "bnb",
+                "token_address": "0xa0B0bd446F76F66E4791631431f4034D08F4a00c"
+            }
+        },
+        {
+            "id": 15851,
+            "rank": null,
+            "name": "Alpha Brain Capital (Old)",
+            "symbol": "ABC",
+            "slug": "alpha-brain-capital",
+            "is_active": 0,
+            "status": 2,
+            "platform": {
+                "id": 1,
+                "name": "Ethereum",
+                "symbol": "ETH",
+                "slug": "ethereum",
+                "token_address": "0x5b4e9a810321e168989802474f689269ec442681"
+            }
+        },
+        {
+            "id": 21696,
+            "rank": null,
+            "name": "ABC Floor Index",
+            "symbol": "ABC",
+            "slug": "abc-floor-index",
+            "is_active": 0,
+            "status": 16,
+            "platform": {
+                "id": 16,
+                "name": "Solana",
+                "symbol": "SOL",
+                "slug": "solana",
+                "token_address": "EKLq86cHRwc8Spkcx2noPnfoVyQvcWSeud5JMJnTxNAD"
+            }
+        },
+        {
+            "id": 28101,
+            "rank": null,
+            "name": "Alpha Bot Calls",
+            "symbol": "ABC",
+            "slug": "alpha-bot-calls",
+            "is_active": 0,
+            "status": 16,
+            "platform": {
+                "id": 1,
+                "name": "Ethereum",
+                "symbol": "ETH",
+                "slug": "ethereum",
+                "token_address": "0xd4d4b7b55b30fb096c30ad202e746d010b47dc30"
+            }
+        }
+    ]
+}

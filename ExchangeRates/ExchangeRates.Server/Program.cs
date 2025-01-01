@@ -3,6 +3,7 @@ using ExchangeRates.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -97,13 +98,19 @@ app.MapGet("/exc", async (HttpContext context, [FromServices] IExchangeRatesApiC
         failure => Results.BadRequest(failure));
 });
 
-app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrencyConverter client) =>
+
+app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrencyConverter client, string symbol) =>
 {
+    Regex validSymbol = ValidSymbol();
+    if (!validSymbol.IsMatch(symbol)) { 
+        return Results.BadRequest("The symbol parameter must be three capital letters (A-Z)");
+    }
+
     var cancellationToken = context.RequestAborted;
     LanguageExt.Common.Result<ExchangeRates.Server.Models.CryptoToFiatsConversion> result;
     try
     {
-        result = await client.GetConversionAsync("BTC", cancellationToken);
+        result = await client.GetConversionAsync(symbol, cancellationToken);
     }
     catch (OperationCanceledException)
     {
@@ -137,4 +144,10 @@ app.Run();
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+partial class Program
+{
+    [GeneratedRegex(@"^[A-Z]{3}$", RegexOptions.Compiled)]
+    private static partial Regex ValidSymbol();
 }

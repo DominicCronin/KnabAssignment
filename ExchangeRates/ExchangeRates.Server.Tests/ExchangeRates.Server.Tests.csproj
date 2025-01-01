@@ -11,11 +11,13 @@
   <ItemGroup>
     <None Remove="cryptocurrency_quote_single_convert_response.json" />
     <None Remove="GetFirstIdForSymbol.json" />
+    <None Remove="GetFirstIdForSymbolWithNullRank.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="cryptocurrency_quote_single_convert_response.json" />
     <EmbeddedResource Include="GetFirstIdForSymbol.json" />
+    <EmbeddedResource Include="GetFirstIdForSymbolWithNullRank.json" />
   </ItemGroup>
 
   <ItemGroup>
