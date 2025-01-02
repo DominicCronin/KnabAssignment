@@ -1,18 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import SymbolForm from './Components/SymbolForm';
 import Conversion, { IConversionProps } from './Components/Conversion';
 import NotFound from './Components/NotFound';
 
-interface Forecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
-}
-
 function App() {
-    const [forecasts, setForecasts] = useState<Forecast[]>();
+
     const [symbol, setSymbol] = useState<string>('');
     const emptyConversion: IConversionProps = { cryptoCurrencySymbol: '', fiatConversions: [] }
     const [conversions, setConversions] = useState<IConversionProps>(emptyConversion)
