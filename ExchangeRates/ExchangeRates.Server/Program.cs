@@ -40,8 +40,6 @@ builder.Services.AddHttpClient<IExchangeRatesApiClient, ExchangeRatesApiClient>(
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -51,54 +49,12 @@ app.MapDefaultEndpoints();
 app.UseDefaultFiles();
 app.MapStaticAssets();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/cmc", async (HttpContext context, [FromServices] ICoinMarketCapQuotesClient client) =>
-{
-    var cancellationToken = context.RequestAborted;
-    LanguageExt.Common.Result<ExchangeRates.Server.Models.CoinMarketCap.CoinMarketCapQuote> result;     
-    try
-    {
-        result = await client.GetLatestQuoteAsync("BTC", cancellationToken);
-    }
-    catch (OperationCanceledException)
-    {
-        return Results.StatusCode(StatusCodes.Status499ClientClosedRequest);
-    }
-    return result.Match(
-        success => Results.Ok(success),
-        failure => Results.BadRequest(failure));
-});
-
-app.MapGet("/exc", async (HttpContext context, [FromServices] IExchangeRatesApiClient client) =>
-{
-    var cancellationToken = context.RequestAborted;
-    LanguageExt.Common.Result<ExchangeRates.Server.Models.ExchangeRatesAPI.RatesModel> result;
-    try
-    {
-        result = await client.GetRatesAsync(cancellationToken);
-    }
-    catch (OperationCanceledException)
-    {
-        return  Results.StatusCode(StatusCodes.Status499ClientClosedRequest);
-    }
-
-    return result.Match(
-        success => Results.Ok(success),
-        failure => Results.BadRequest(failure));
-});
-
 
 app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrencyConverter client, string symbol) =>
 {
@@ -128,29 +84,9 @@ app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrenc
         });
 });
 
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
 app.MapFallbackToFile("/index.html");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 
 partial class Program
 {
