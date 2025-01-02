@@ -46,12 +46,12 @@ namespace ExchangeRates.Server.Services
 
             // First add the crypto to base currency conversion
             // If symbol is BTC and price is 90056, then the conversion is 1 BTC = 90056 EUR
-            conversion.FiatConversions.Add(latestQuote.TargetCurrencySymbol, latestQuote.Quote.Price);
+            conversion.FiatConversions.Add(new FiatRate(latestQuote.TargetCurrencySymbol, latestQuote.Quote.Price));
             // Now we can add the other currencies. 
             foreach (var rate in rates.Rates)
             {
                 // Now convert from EUR to USD or whatever
-                conversion.FiatConversions.Add(rate.Key, latestQuote.Quote.Price * rate.Value);
+                conversion.FiatConversions.Add(new FiatRate(rate.Key, latestQuote.Quote.Price * rate.Value));
             }
 
             return conversion;

@@ -1,16 +1,36 @@
-
-interface IConversionProps {
-    symbol: string
+import './Conversion.css'
+export interface IConversionProps {
+    cryptoCurrencySymbol: string,
+    fiatConversions: IFiatConversion[]
 }
+
+interface IFiatConversion {
+    fiatSymbol: string,
+    rate: number
+}
+
 function Conversion(props: IConversionProps) {
-    const { symbol } = props
+    const { cryptoCurrencySymbol, fiatConversions } = props
   return (
-      <>
-          <div>
-              <h1 >Currency conversion</h1>
-              <p>The following exchange rates have been retrieved for symbol {symbol} </p>                   
-          </div>          
-      </>
+        <div>              
+            <p>The following exchange rates have been retrieved for symbol {cryptoCurrencySymbol} </p>                   
+            <table>
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {fiatConversions.map(conversion =>
+                        <tr key={conversion.fiatSymbol}>
+                            <td>{conversion.fiatSymbol}</td>
+                            <td>{conversion.rate}</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+         </div>
   );
 }
 

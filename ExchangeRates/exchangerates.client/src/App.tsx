@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import SymbolForm from './Components/SymbolForm';
-import Conversion from './Components/Conversion';
+import Conversion, { IConversionProps } from './Components/Conversion';
+import NotFound from './Components/NotFound';
 
 interface Forecast {
     date: string;
@@ -13,56 +14,31 @@ interface Forecast {
 function App() {
     const [forecasts, setForecasts] = useState<Forecast[]>();
     const [symbol, setSymbol] = useState<string>('');
-
-    useEffect(() => {
-        populateWeatherData();
-    }, []);
-
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
-
+    const emptyConversion: IConversionProps = { cryptoCurrencySymbol: '', fiatConversions: [] }
+    const [conversions, setConversions] = useState<IConversionProps>(emptyConversion)
+    const [hasDoneConversion, setHasDoneConversion] = useState(false);
+    
     return (
         <>
         <div>
-            <h1 id="tableLabel">Weather forecast from App.tsx</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+            <h1 >Currency conversion</h1>
+                <SymbolForm handleSubmittedSymbol={handleSubmittedSymbol} />
+                {conversions.cryptoCurrencySymbol && < Conversion {...conversions} />}                
+                {hasDoneConversion && !conversions.cryptoCurrencySymbol && <NotFound symbol={symbol} />}                
             </div>
-
-            <SymbolForm handleSubmittedSymbol={setSymbol} />
-            <Conversion symbol={symbol} />
         </>
     );
 
     async function handleSubmittedSymbol(symbol: string) {
-        const response = await fetch(`convert&symbol=${symbol}`)
-    }
-
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
+        setHasDoneConversion(true);
+        setSymbol(symbol)
+        const response = await fetch(`convert?symbol=${symbol}`)
         if (response.ok) {
             const data = await response.json();
-            setForecasts(data);
+            setConversions(data)
+        }
+        else {
+            setConversions(emptyConversion)
         }
     }
 }

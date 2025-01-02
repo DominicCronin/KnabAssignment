@@ -1,9 +1,11 @@
 ﻿namespace ExchangeRates.Server.Models
 {
-    public class CryptoToFiatsConversion
+    public record CryptoToFiatsConversion
     {
         public required string CryptoCurrencySymbol { get; init; }
-        public Dictionary<string, double> FiatConversions{ get; } = [];
+        public List<FiatRate> FiatConversions{ get; } = [];
 
     }
+
+    public record FiatRate(string FiatSymbol, double Rate);
 }
