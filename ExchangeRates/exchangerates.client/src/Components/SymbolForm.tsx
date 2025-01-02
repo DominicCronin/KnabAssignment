@@ -1,4 +1,5 @@
 import React from "react";
+import './SymbolForm.css';
 
 interface ISymbolFormProps {
     handleSubmittedSymbol: (symbol: string) => void
@@ -7,6 +8,7 @@ function SymbolForm(props: ISymbolFormProps) {
     const { handleSubmittedSymbol } = props;
 
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
     React.useEffect(() => {
         inputRef.current && inputRef.current.focus();
     }, []);
@@ -15,20 +17,26 @@ function SymbolForm(props: ISymbolFormProps) {
         symbol,
         setSymbol,
     ] = React.useState('');
+    const isFull = symbol.length > 2;
 
     return (
-        <form onSubmit={(event) => {
+        <form className="symbolInput" onSubmit={(event) => {
             event.preventDefault();
-            handleSubmittedSymbol(symbol);
+            if (isFull) {
+                handleSubmittedSymbol(symbol);    
+            }            
         }}>
           <input
               ref={inputRef}
               value={symbol}
-              onChange={(event) => {
-                  setSymbol(event.target.value);
+                onChange={(event) => {
+                    setSymbol(event.target.value.toUpperCase().substring(0,3));
               }}
-          />
-          <button>Convert</button>
+            />
+            <button
+                ref={buttonRef}
+                disabled={!isFull}
+            >Convert</button>
       </form>
   );
 }

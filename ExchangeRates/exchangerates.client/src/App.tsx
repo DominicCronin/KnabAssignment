@@ -55,7 +55,7 @@ function App() {
     );
 
     async function handleSubmittedSymbol(symbol: string) {
-        const response = await fetch('convert')
+        const response = await fetch(`convert&symbol=${symbol}`)
     }
 
     async function populateWeatherData() {
