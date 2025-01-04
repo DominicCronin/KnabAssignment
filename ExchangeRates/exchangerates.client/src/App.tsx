@@ -13,24 +13,30 @@ function App() {
     
     return (
         <>
-        <div>
-            <h1 >Currency conversion</h1>
-                <SymbolForm handleSubmittedSymbol={handleSubmittedSymbol} />
-                {conversions.cryptoCurrencySymbol && < Conversion {...conversions} />}                
-                {hasDoneConversion && !conversions.cryptoCurrencySymbol && <NotFound symbol={symbol} />}                
-            </div>
+            <div className='container'>
+            <div className='entry'>
+                <h1 >Currency conversion</h1>
+                    <SymbolForm handleSubmittedSymbol={handleSubmittedSymbol} />
+                </div>
+                <div className='result'>
+                    {hasDoneConversion && conversions.cryptoCurrencySymbol && <Conversion {...conversions} />}
+                    {hasDoneConversion && !conversions.cryptoCurrencySymbol && <NotFound symbol={symbol} />}                
+                </div>
+        </div>
         </>
     );
 
     async function handleSubmittedSymbol(symbol: string) {
-        setHasDoneConversion(true);
+        setHasDoneConversion(false);
         setSymbol(symbol)
         const response = await fetch(`convert?symbol=${symbol}`)
         if (response.ok) {
+            setHasDoneConversion(true)
             const data = await response.json();
             setConversions(data)
         }
         else {
+            setHasDoneConversion(true)
             setConversions(emptyConversion)
         }
     }
