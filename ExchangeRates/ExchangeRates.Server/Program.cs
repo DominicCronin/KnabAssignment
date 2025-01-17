@@ -1,4 +1,5 @@
 using ExchangeRates.Server.Exceptions;
+using ExchangeRates.Server.Middleware;
 using ExchangeRates.Server.Options;
 using ExchangeRates.Server.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ builder.Services.AddHttpClient<IExchangeRatesApiClient, ExchangeRatesApiClient>(
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<GeneralExceptionHandlerMiddleware>();
 
 var app = builder.Build();
 
@@ -85,6 +87,7 @@ app.MapGet("/convert", async (HttpContext context, [FromServices] ICryptoCurrenc
 });
 
 app.MapFallbackToFile("/index.html");
+app.UseGeneralExceptionHandler();
 
 app.Run();
 
